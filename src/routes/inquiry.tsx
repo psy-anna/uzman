@@ -20,7 +20,7 @@ function Inquiry() {
   const search = Route.useSearch();
   return (
     <>
-      <div className="h-20 bg-navy" />
+      <div className="h-16 bg-navy" />
       <section className="mx-auto grid max-w-[1440px] gap-12 px-5 py-20 md:grid-cols-12 md:px-10 md:py-28">
         <aside className="md:col-span-4">
           <SectionLabel no="→">Технический запрос</SectionLabel>

@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { categories, manufacturers, statusLabel, type Manufacturer } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
@@ -32,44 +32,64 @@ export function Button({
 
 export function Header() {
   const [open, setOpen] = useState(false);
+  const [solid, setSolid] = useState(false);
+  useEffect(() => {
+    const on = () => setSolid(window.scrollY > 40);
+    on();
+    window.addEventListener("scroll", on, { passive: true });
+    return () => window.removeEventListener("scroll", on);
+  }, []);
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+  }, [open]);
   return (
-    <header className="absolute inset-x-0 top-0 z-40 text-ink">
-      <div className="mx-auto flex h-20 max-w-[1440px] items-center justify-between border-b border-line px-5 md:px-10">
-        <Link to="/" className="flex items-baseline gap-3" aria-label="Uzman Rulman — главная">
-          <span className="font-display text-lg font-semibold tracking-tight">UZMAN RULMAN</span>
-          <span className="label hidden text-steel sm:inline">Marine spare parts</span>
+    <header className={cn("fixed inset-x-0 top-0 z-40 text-ink transition-colors duration-500", solid || open ? "bg-navy/95 backdrop-blur-sm" : "bg-transparent")}>
+      <div className={cn("mx-auto flex h-16 max-w-[1440px] items-center justify-between gap-8 px-5 md:px-10", solid ? "border-b border-line" : "border-b border-transparent")}>
+        <Link to="/" className="flex shrink-0 items-center gap-3 whitespace-nowrap" aria-label="Uzman Rulman — главная" onClick={() => setOpen(false)}>
+          <span className="block h-3 w-3 bg-signal" aria-hidden />
+          <span className="font-display text-[15px] font-semibold tracking-[0.08em]">UZMAN RULMAN</span>
         </Link>
-        <nav className="hidden items-center gap-8 lg:flex" aria-label="Основная навигация">
+        <nav className="hidden items-center gap-7 lg:flex" aria-label="Основная навигация">
           {nav.map((n) => (
             <Link
               key={n.to}
               to={n.to}
-              className="label group relative py-2 text-ink/80 transition-colors hover:text-ink"
-              activeProps={{ className: "text-ink [&>span]:scale-x-100" }}
+              className="label group relative whitespace-nowrap py-5 text-ink/70 transition-colors hover:text-ink"
+              activeProps={{ className: "!text-ink [&>span]:!scale-x-100" }}
             >
               {n.label}
-              <span className="absolute inset-x-0 -bottom-px h-px origin-left scale-x-0 bg-signal transition-transform duration-500 group-hover:scale-x-100" />
+              <span className="absolute inset-x-0 bottom-0 h-px origin-left scale-x-0 bg-signal transition-transform duration-500 group-hover:scale-x-100" />
             </Link>
           ))}
         </nav>
-        <Button to="/inquiry" className="hidden lg:inline-flex">Отправить технический запрос ↗</Button>
+        <Button to="/inquiry" className="hidden min-h-10 whitespace-nowrap px-5 lg:inline-flex">Технический запрос ↗</Button>
         <button
-          className="label min-h-12 px-2 lg:hidden"
+          className="label -mr-2 flex min-h-12 min-w-12 items-center justify-end gap-3 px-2 lg:hidden"
           aria-expanded={open}
           aria-controls="mobile-nav"
           onClick={() => setOpen((o) => !o)}
         >
           {open ? "Закрыть" : "Меню"}
+          <span className="flex w-5 flex-col gap-[5px]" aria-hidden>
+            <span className={cn("h-px bg-ink transition-transform", open && "translate-y-[3px] rotate-45")} />
+            <span className={cn("h-px bg-ink transition-transform", open && "-translate-y-[3px] -rotate-45")} />
+          </span>
         </button>
       </div>
       {open && (
-        <nav id="mobile-nav" className="border-b border-line bg-navy px-5 pb-8 lg:hidden" aria-label="Мобильная навигация">
-          {nav.map((n, i) => (
-            <Link key={n.to} to={n.to} onClick={() => setOpen(false)} className="flex items-baseline gap-4 border-b border-line py-5">
-              <span className="label text-signal">0{i + 1}</span>
-              <span className="font-display text-2xl">{n.label}</span>
-            </Link>
-          ))}
+        <nav id="mobile-nav" className="fixed inset-x-0 bottom-0 top-16 flex flex-col justify-between overflow-y-auto bg-navy px-5 pb-8 pt-4 lg:hidden" aria-label="Мобильная навигация">
+          <div>
+            {nav.map((n, i) => (
+              <Link key={n.to} to={n.to} onClick={() => setOpen(false)} className="flex min-h-16 items-baseline gap-5 border-b border-line py-5">
+                <span className="mono text-signal">0{i + 1}</span>
+                <span className="font-display text-3xl">{n.label}</span>
+              </Link>
+            ))}
+          </div>
+          <div onClick={() => setOpen(false)} className="pt-10">
+            <p className="mono mb-4 text-steel">OEM PART NO. / MODEL / SERIAL NO.</p>
+            <Button to="/inquiry" className="w-full justify-center">Отправить технический запрос ↗</Button>
+          </div>
         </nav>
       )}
     </header>
@@ -112,18 +132,20 @@ export function ProductDirection({ c }: { c: (typeof categories)[number] }) {
     <Link
       to="/products/$slug"
       params={{ slug: c.slug }}
-      className="group relative grid grid-cols-[3rem_1fr] items-baseline gap-x-4 border-t border-line py-7 md:grid-cols-[6rem_1fr_18rem_3rem] md:py-9"
+      className="group relative grid grid-cols-[1fr_auto] items-center gap-x-6 border-t border-line py-8 md:grid-cols-[7rem_1fr_16rem_3rem] md:py-10"
     >
-      <span className="label text-signal">{c.no}</span>
-      <h3 className="font-display text-2xl text-ink transition-transform duration-500 group-hover:translate-x-2 md:text-4xl lg:text-5xl">{c.title}</h3>
-      <p className="col-start-2 mt-3 text-sm text-steel md:col-start-3 md:mt-0">{c.short}</p>
-      <span className="hidden text-right text-2xl text-steel transition-colors group-hover:text-signal md:block">↗</span>
-      <img
-        src={c.image}
-        alt=""
-        loading="lazy"
-        className="photo-treat pointer-events-none absolute right-24 top-1/2 hidden h-48 w-72 -translate-y-1/2 object-cover opacity-0 transition-all duration-700 [clip-path:inset(0_100%_0_0)] group-hover:opacity-100 group-hover:[clip-path:inset(0_0_0_0)] xl:block"
-      />
+      <span className="mono col-span-2 mb-4 text-steel md:col-span-1 md:mb-0">
+        <span className="text-signal">{c.no}</span> / 05
+      </span>
+      <h3 className="font-display text-[1.7rem] font-light leading-[1.05] text-ink transition-transform duration-700 ease-out group-hover:translate-x-3 md:text-5xl lg:text-[3.6rem]">
+        {c.title}
+      </h3>
+      <span className="text-2xl text-steel transition-all duration-500 group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-signal md:order-last md:text-right">↗</span>
+      <p className="col-span-2 mt-4 max-w-sm text-sm leading-relaxed text-steel md:col-span-1 md:mt-0">{c.short}</p>
+      <div className="pointer-events-none absolute right-[22rem] top-1/2 hidden h-56 w-80 -translate-y-1/2 overflow-hidden opacity-0 transition-all duration-700 [clip-path:inset(50%_0_50%_0)] group-hover:opacity-100 group-hover:[clip-path:inset(0_0_0_0)] xl:block">
+        <img src={c.image} alt="" loading="lazy" className="photo-treat h-full w-full scale-110 object-cover transition-transform duration-[1200ms] group-hover:scale-100" />
+        <span className="mono absolute bottom-2 left-2 text-ink">FIG. {c.no}</span>
+      </div>
     </Link>
   );
 }
@@ -201,9 +223,9 @@ export function PageHero({ no, eyebrow, title, intro, image }: { no: string; eye
     <section className="relative overflow-hidden bg-navy text-ink">
       {image && <img src={image} alt="" className="photo-treat absolute inset-0 h-full w-full object-cover opacity-45" />}
       <div className="absolute inset-0 bg-gradient-to-r from-navy via-navy/85 to-navy/30" />
-      <div className="relative mx-auto max-w-[1440px] px-5 pb-20 pt-40 md:px-10 md:pb-28 md:pt-52">
+      <div className="relative mx-auto max-w-[1440px] px-5 pb-20 pt-36 md:px-10 md:pb-28 md:pt-48">
         <SectionLabel no={no} dark>{eyebrow}</SectionLabel>
-        <h1 className="reveal mt-8 max-w-5xl text-4xl uppercase leading-[1.02] md:text-7xl">{title}</h1>
+        <h1 className="reveal mt-8 max-w-5xl text-4xl font-light uppercase leading-[1] tracking-[-0.03em] md:text-7xl">{title}</h1>
         {intro && <p className="reveal mt-8 max-w-2xl text-lg text-steel [animation-delay:150ms]">{intro}</p>}
         <div className="line-draw mt-14 h-px w-full bg-line" />
       </div>
