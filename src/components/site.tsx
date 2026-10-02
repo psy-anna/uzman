@@ -223,9 +223,9 @@ export function PageHero({ no, eyebrow, title, intro, image }: { no: string; eye
     <section className="relative overflow-hidden bg-navy text-ink">
       {image && <img src={image} alt="" className="photo-treat absolute inset-0 h-full w-full object-cover opacity-45" />}
       <div className="absolute inset-0 bg-gradient-to-r from-navy via-navy/85 to-navy/30" />
-      <div className="relative mx-auto max-w-[1440px] px-5 pb-20 pt-40 md:px-10 md:pb-28 md:pt-52">
+      <div className="relative mx-auto max-w-[1440px] px-5 pb-20 pt-36 md:px-10 md:pb-28 md:pt-48">
         <SectionLabel no={no} dark>{eyebrow}</SectionLabel>
-        <h1 className="reveal mt-8 max-w-5xl text-4xl uppercase leading-[1.02] md:text-7xl">{title}</h1>
+        <h1 className="reveal mt-8 max-w-5xl text-4xl font-light uppercase leading-[1] tracking-[-0.03em] md:text-7xl">{title}</h1>
         {intro && <p className="reveal mt-8 max-w-2xl text-lg text-steel [animation-delay:150ms]">{intro}</p>}
         <div className="line-draw mt-14 h-px w-full bg-line" />
       </div>
