@@ -13,7 +13,7 @@ const nav = [
 
 export function Button({
   to, search, children, variant = "signal", className,
-}: { to: string; search?: Record<string, string>; children: ReactNode; variant?: "signal" | "ghost-light" | "ghost-dark"; className?: string }) {
+}: { to: string; search?: Record<string, string> | undefined; children: ReactNode; variant?: "signal" | "ghost-light" | "ghost-dark"; className?: string }) {
   const styles = {
     signal: "bg-signal text-ink hover:bg-ink hover:text-navy",
     "ghost-light": "border border-line text-ink hover:border-signal hover:text-signal",
@@ -177,7 +177,7 @@ export function ManufacturerIndex({ list = manufacturers }: { list?: Manufacture
   );
 }
 
-export function InquiryCTA({ title, search }: { title: string; search?: Record<string, string> }) {
+export function InquiryCTA({ title, search }: { title: string; search?: Record<string, string> | undefined }) {
   return (
     <section className="blueprint relative bg-navy text-ink">
       <div className="mx-auto grid max-w-[1440px] gap-10 px-5 py-24 md:grid-cols-12 md:px-10 md:py-32">
